@@ -51,9 +51,9 @@ class UserController extends Controller
         $user = User::create($data);
         $code = random_int(1000, 9999);
         $message = 'Hi! Your Raxon verification code is ' . $code . '.';
-        /*$response = (new \therealsmat\Ebulksms\EbulkSMS())->composeMessage($message)
+        $response = (new \therealsmat\Ebulksms\EbulkSMS())->composeMessage($message)
             ->addRecipients($request->phone)
-            ->send();*/
+            ->send();
         $user->forceFill([
             'verification_code' => $code,
         ])->save();
