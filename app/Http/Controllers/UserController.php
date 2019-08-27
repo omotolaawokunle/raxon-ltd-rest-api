@@ -45,19 +45,20 @@ class UserController extends Controller
             return response()->json(['error' => $validator->errors()], 401);
         }
 
-        $data = $request->only(['name', 'business_name', 'address', 'city', 'state', 'service', 'phone', 'password']);
-        $data['password'] = bcrypt($data['password']);
-
+        $code = random_int(1000, 9999);
+        $message = 'Hi! Your Raxon verification code is ' . $code . '.';
+        
         $response = (new \therealsmat\Ebulksms\EbulkSMS())->composeMessage($message)
-            ->addRecipients($data['phone'])
+            ->addRecipients($request->phone)
             ->send();
+        
         if($response['status'] == "MISSING_RECIPIENT" || $response['status'] == "INVALID_RECIPIENT" {
             return response()->json(["message" => "Invalid Phone Number"], 401);
         }
-
+        
+        $data = $request->only(['name', 'business_name', 'address', 'city', 'state', 'service', 'phone', 'password']);
+        $data['password'] = bcrypt($data['password']);
         $user = User::create($data);
-        $code = random_int(1000, 9999);
-        $message = 'Hi! Your Raxon verification code is ' . $code . '.';
         
         $user->forceFill([
             'verification_code' => $code,
